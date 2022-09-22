@@ -1,4 +1,4 @@
-from linkedQFile import LinkedQ
+from linkedQ import LinkedQ
 
 
 class Node:
@@ -80,7 +80,7 @@ def searches(tree):
         findme = input().strip()
 
 
-def makechildren(startord,q):
+def makechildren(startord, q, gamla):
     """
     Byter ut en bokstav i taget: startord -> slutord
     :param startord: ord med tre bokstäver
@@ -95,24 +95,23 @@ def makechildren(startord,q):
     alfa = ["a", "b", "c", "d", "e", "f", "g", "h", "i", "j",
             "k", "l","m", "n", "o", "p", "q", "r", "s", "t",
             "u", "v", "w", "x", "y", "z", "å", "ä", "ö"]
-    orden = [] #alla orden man får genom att bara byta en bokstav från startordet dvs startordets barn
 
     for i in range(len(alfa)):
         x = startord.replace(startord[0], alfa[i], 1)
         y = startord.replace(startord[1], alfa[i], 1)
         z = startord.replace(startord[2], alfa[i], 1)
-        if x not in orden and x != startord and x in lista:
-            orden.append(x)
-            q.enqueue(x)
-        if y not in orden and y != startord and y in lista:
-            orden.append(y)
-            q.enqueue(y)
-        if z not in orden and z != startord and z in lista:
-            orden.append(z)
-            q.enqueue(z)
-    #words.remove(startord)
-    #print(orden)
-    return orden
+        if x != startord and x in lista:
+            if x not in gamla:
+                q.enqueue(x)
+                gamla.put(x)
+        if y != startord and y in lista:
+            if y not in gamla:
+                q.enqueue(y)
+                gamla.put(y)
+        if z != startord and z in lista:
+            if z not in gamla:
+                q.enqueue(z)
+                gamla.put(z)
 
 
 def main():
@@ -121,40 +120,23 @@ def main():
     with open("word3.txt", "r", encoding="utf-8") as svenskfil:
         for rad in svenskfil:
             ordet = rad.strip()
-            if ordet in svenska:
-                gamla.put(ordet)
-            else:
+            if ordet not in svenska:
                 svenska.put(ordet)
     print("Ange startord: ")
     startord = input().strip()
     q = LinkedQ()
-    makechildren(startord, q)
-
-    '''words = makechildren(startord,q)
-    for i in words:
-        if i in svenska:
-            print(i)
-        else:
-            gamla.put(i)
-    print("\n")'''
-
-    #q.enqueue(words)
+    makechildren(startord, q, gamla)
     print("Ange slutord:")
     slutord = input().strip()
-
-    # typ nåt sånt här för att undersöka om slutordet ens finns i word3-filen
-    #if slutord not in svenska or gamla:
-        #print("Det finns ingen väg till", slutord + ".")
-    #else:
-        #pass
-
     while not q.isEmpty():
         word = q.dequeue()
-        makechildren(word, q)
-        print(word)
+        gamla.put(word)
+        makechildren(word, q, gamla)
         if word == slutord:
             print("Det finns en väg till", slutord + ".")
-            break
+            exit()
+    print("Det finns ingen väg till", slutord + ".")
+
 
 if __name__ == '__main__':
     main()
