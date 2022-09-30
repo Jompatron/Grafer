@@ -1,4 +1,4 @@
-from linkedQ import LinkedQ
+from linkedQFile import LinkedQ
 
 
 class ParentNode:
@@ -6,9 +6,10 @@ class ParentNode:
         self.word = word
         self.parent = parent
 
+    #skriver ut vägen från start till slut
     def write_chain(self, parent):
         if self.parent is not None:
-            ParentNode.write_chain(self.parent, self.parent.parent)
+            ParentNode.write_chain(self.parent, self.parent.parent) #kallar rekursivt på funktionen (node = nodens förälder, parent = nodens "farfar")
             print(self.word)
 
 
@@ -91,7 +92,7 @@ def searches(tree):
         findme = input().strip()
 
 
-def makechildren(startord, q, gamla):
+def makechildren(startord, q, gamla): #nod.word ist för ordet som indata
     lista = []
     with open("word3.txt", "r", encoding="utf-8") as svenskfil:
         for rad in svenskfil:
@@ -103,12 +104,12 @@ def makechildren(startord, q, gamla):
             "u", "v", "w", "x", "y", "z", "å", "ä", "ö"]
 
     for i in range(len(alfa)):
-        x = startord.word.replace(startord.word[0], alfa[i], 1)
-        y = startord.word.replace(startord.word[1], alfa[i], 1)
-        z = startord.word.replace(startord.word[2], alfa[i], 1)
+        x = startord.word.replace(startord.word[0], alfa[i], 1)         #kollar om x (samt y och z) finns i dumbarnen och lägger dit det om det inte finns
+        y = startord.word.replace(startord.word[1], alfa[i], 1)         #lägger in ordet i kön för att möjliggöra en breddenförstsökning
+        z = startord.word.replace(startord.word[2], alfa[i], 1)         #lägger in permutationen i gamla-trädet för att undvika upprepningar (om det inte rtedan finns)
         if x != startord and x in lista:
             if x not in gamla:
-                q.enqueue(ParentNode(x, startord))
+                q.enqueue(ParentNode(x, startord))                      #köar noden med det nya ordet som data
                 gamla.put(x)
         if y != startord and y in lista:
             if y not in gamla:
@@ -130,16 +131,16 @@ def main():
                 svenska.put(ordet)
     print("Ange startord: ")
     startord = input().strip()
-    start = ParentNode(startord)
+    start = ParentNode(startord)        #gör om startordet till en nod
     gamla.put(startord)
     q = LinkedQ()
-    makechildren(start, q, gamla)
+    makechildren(start, q, gamla)       #lägger in barnen till startordet i kön
     print("Ange slutord:")
     slutord = input().strip()
     slut = ParentNode(slutord)
     while not q.isEmpty():
         word = q.dequeue()
-        makechildren(word, q, gamla)
+        makechildren(word, q, gamla)    #skapar barn med ordet från kön
         if word.word == slutord:
             print("Det finns en väg till", slutord, "från", startord + ".")
             print(startord)
